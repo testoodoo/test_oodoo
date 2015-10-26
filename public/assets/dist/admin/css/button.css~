@@ -1,0 +1,35 @@
+a, button {
+    display:list-item;
+    margin:10px 0;
+}
+
+a.button, button.btn {
+    color: #6e6e6e;
+    font: bold 12px Helvetica, Arial, sans-serif;
+    text-decoration: none;
+    padding: 7px 12px;
+    position: relative;
+    display: inline-block;
+    background: #f3f3f3;
+    background: -webkit-gradient(linear,0% 40%,0% 70%,from(#F5F5F5),to(#F1F1F1));
+    background: -moz-linear-gradient(linear,0% 40%,0% 70%,from(#F5F5F5),to(#F1F1F1));
+    border: solid 1px #dcdcdc;
+    border-radius: 2px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    margin-right: 10px;
+}
+
+
+a.red, button.red {
+    color:#fff;
+    background: red;
+    background: -webkit-gradient(linear,0% 40%,0% 70%,from(#FF0000),to(#F1F1F1));
+    background: -moz-linear-gradient(linear,0% 40%,0% 70%,from(#FF0000),to(#F1F1F1));
+}
+
+a.green, button.green {
+    background: #7FFF24;
+     background: -webkit-gradient(linear,0% 40%,0% 70%,from(#7FFF24),to(#F1F1F1));
+     background: -moz-linear-gradient(linear,0% 40%,0% 70%,from(#7FFF24),to(#F1F1F1));
+}

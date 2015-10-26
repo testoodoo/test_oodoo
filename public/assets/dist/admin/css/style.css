@@ -1,0 +1,264 @@
+/* 
+	author: istockphp.com
+*/
+@import url(http://fonts.googleapis.com/css?family=Capriola);
+body { 
+	font-family: sans-serif;
+	font-size:13px;
+	background:#CCCCCC;
+	color:#444444;
+}
+p { 
+	padding:2px 
+}
+#wrap { 
+	width:1024px; 
+	padding:20px; 
+	margin:20px auto;
+	background:#fff;
+	border:1px solid #cc;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+}
+div#wrap2 {
+    border: 1px solid #CCCCCC;
+    margin-bottom: 10px;
+    padding:15px 120px 15px;
+}
+h2.account_hdr {
+    color: #3399FF;
+    display: block;
+    margin-bottom: 25px;
+}
+
+/*
+### Registration Form
+*/
+
+form#register_form label { 
+	display:inline-block; /* with block na */
+	width:125px;
+	font-weight:bold;
+}
+form#register_form label:after { 
+	content:":"
+}
+form#register_form input[type='text'], input[type='password'] { 
+	display:inline-block; /* with block na */
+	width:200px;
+	border:1px solid #ccc;
+	margin:0;
+	padding:5px;
+}
+form#register_form select {
+    border: 1px solid #CCCCCC;
+    display: inline-block;
+    margin: 0;
+    padding: 5px 0
+}
+form#register_form input[name='submit'] { 
+	border:1px solid #3399FF;
+	background:#3399FF;
+	border-radius: 5px;
+	margin:10px;
+	color:#FFF;
+	padding:5px;
+	font-weight:bold
+}
+form#register_form input[name='submit'] { 
+	cursor:pointer;
+}
+
+/*
+### Activation Form
+*/
+
+form#activate_form label { 
+	display:inline-block; /* with block na */
+	width:125px;
+	font-weight:bold;
+}
+form#activate_form label:after { 
+	content:":"
+}
+form#activate_form input[type='text'], input[type='password'] { 
+	display:inline-block; /* with block na */
+	width:200px;
+	border:1px solid #ccc;
+	margin:0;
+	padding:5px;
+}
+form#activate_form select {
+    border: 1px solid #CCCCCC;
+    display: inline-block;
+    margin: 0;
+    padding: 5px 0
+}
+form#activate_form input[name='submit'] { 
+	border:1px solid #3399FF;
+	background:#3399FF;
+	border-radius: 5px;
+	margin:10px;
+	color:#FFF;
+	padding:5px;
+	font-weight:bold
+}
+form#activate_form input[name='submit'] { 
+	cursor:pointer;
+}
+/*
+## device_form
+*/
+
+form#device_form label { 
+	display:inline-block; /* with block na */
+	width:125px;
+	font-weight:bold;
+}
+form#device_form label:after { 
+	content:":"
+}
+form#device_form input[type='text'], input[type='password'] { 
+	display:inline-block; /* with block na */
+	width:200px;
+	border:1px solid #ccc;
+	margin:0;
+	padding:5px;
+}
+form#device_form select {
+    border: 1px solid #CCCCCC;
+    display: inline-block;
+    margin: 0;
+    padding: 5px 0
+}
+form#device_form input[name='submit'] { 
+	border:1px solid #3399FF;
+	background:#3399FF;
+	border-radius: 5px;
+	margin:10px;
+	color:#FFF;
+	padding:5px;
+	font-weight:bold
+}
+form#device_form input[name='submit'] { 
+	cursor:pointer;
+}
+
+
+p.validate_msg {
+    border: 1px solid #FF0000;
+    font-weight: bold;
+    padding: 10px;
+	display:none;
+	margin-bottom:25px
+}
+span.validate  {
+	color:#F00;
+	padding-left:8px;
+	font-style:italic;
+}
+#cssmenu,
+#cssmenu ul,
+#cssmenu ul li,
+#cssmenu ul li a {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  list-style: none;
+  line-height: 1;
+  display: block;
+  position: relative;
+  font-family: Capriola, Helvetica, sans-serif;
+}
+#cssmenu {
+  width: auto;
+  height: 59px;
+  padding-bottom: 4px;
+}
+#cssmenu.align-right {
+  float: right;
+}
+#cssmenu.align-right ul li {
+  float: right;
+  margin-right: 0;
+  margin-left: 4px;
+}
+#cssmenu.align-right ul li:first-child,
+#cssmenu.align-right ul li:first-child > a {
+  border-bottom-right-radius: 3px;
+}
+#cssmenu #bg-one,
+#cssmenu #bg-two,
+#cssmenu #bg-three,
+#cssmenu #bg-four {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+#cssmenu #bg-one {
+  height: 2px;
+  background: #0f71ba;
+}
+#cssmenu #bg-two {
+  height: 59px;
+  z-index: 2;
+  background: url('../images/bg.png');
+}
+#cssmenu #bg-three {
+  bottom: 4px;
+  height: 55px;
+  z-index: 3;
+  background: #FFFFFF;
+  background: -moz-linear-gradient(top, #FFFFFF 0%, #FFFFFF 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #FFFFFF), color-stop(100%, #FFFFFF));
+  background: -webkit-linear-gradient(top, #FFFFFF 0%, #FFFFFF 100%);
+  background: -o-linear-gradient(top, #FFFFFF 0%, #FFFFFF 100%);
+  background: -ms-linear-gradient(top, #FFFFFF 0%, #FFFFFF 100%);
+  background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 100%);
+}
+#cssmenu #bg-four {
+  bottom: 4px;
+  height: 55px;
+  z-index: 4;
+  background: url('../images/bg.png');
+}
+#cssmenu ul {
+  height: 59px;
+}
+#cssmenu ul li {
+  float: left;
+  margin-right: 4px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  z-index: 5;
+}
+#cssmenu ul li a {
+  padding: 24px 30px 20px 30px;
+  margin-bottom: 4px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  color: #000000;
+  font-size: 15px;
+  text-decoration: none;
+}
+#cssmenu ul li:first-child,
+#cssmenu ul li:first-child > a {
+  border-bottom-left-radius: 3px;
+}
+#cssmenu ul li:hover,
+#cssmenu ul li.active {
+  background: #0f71ba;
+  background: -moz-linear-gradient(top, #3fa4f0 0%, #0f71ba 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #3fa4f0), color-stop(100%, #0f71ba));
+  background: -webkit-linear-gradient(top, #3fa4f0 0%, #0f71ba 100%);
+  background: -o-linear-gradient(top, #3fa4f0 0%, #0f71ba 100%);
+  background: -ms-linear-gradient(top, #3fa4f0 0%, #0f71ba 100%);
+  background: linear-gradient(to bottom, #3fa4f0 0%, #0f71ba 100%);
+}
+#cssmenu ul li a:hover,
+#cssmenu ul li.active > a {
+  background: url('../images/bg.png');
+  color: #ffffff;
+}
