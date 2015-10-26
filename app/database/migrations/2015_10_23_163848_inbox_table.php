@@ -35,3 +35,10 @@ class InboxTable extends Migration {
 	}
 
 }
+
+
+
+From:{{$messageSender}}<br>
+To: {{$message->payload['headers']['0']['value']}}<br>
+Sub: {{$message->payload['headers']['12']['value']}}
+217b5837e8a6b61fea9ab2f5d8ec39f7d29c78c0
