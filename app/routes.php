@@ -16,3 +16,4 @@
 	Route::get('/list', array('as' => 'list', 'uses' => 'ApiController@listMessage'));
 	Route::get('/get', array('as' => 'get', 'uses' => 'ApiController@getMessage'));
 	Route::get('/show/{messageId}', array('as' => 'show', 'uses' => 'ApiController@showMessage'));	
+	Route::post('/reply', array('as' => 'reply', 'uses' => 'ApiController@replyMessage'));

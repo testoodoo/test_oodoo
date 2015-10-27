@@ -15,11 +15,12 @@ class InboxTable extends Migration {
 	Schema::create('inbox_table', function(Blueprint $table)
         {
   			$table->integer('id');
-  			$table->string('messageid'); 
+  			$table->string('messageid')->unique(); 
   			$table->string('subject');
-  			$table->string('snippet'); 
-  			$table->string('date');
- 			$table->string('sender');
+  			$table->string('from_mail'); 
+  			$table->string('to_mail');
+ 			$table->string('time');
+ 			$table->longtext('body');
             $table->timestamps();
         });
 	}

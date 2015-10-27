@@ -138,22 +138,29 @@ $list = $service->users_messages->listUsersMessages('me',['maxResults' => 20]);
     #return $inboxMessage;
     return View::make("api.list",$inboxMessage);
 }
-public function sendMessage() {
+public function replyMessage() {
   try {
   	$client = $this->getClient();
   	$service = new Google_Service_Gmail($client);
- 	$userId = 'me';
+ 	  $userId = 'me';
+    $from = Input::get('from');
+    $to = Input::get('to');
+    $subject = Input::get('subject');
+    $from_name = Input::get('from_name');
+    $to_name = Input::get('to_name');
+    $body = Input::get('body');
     $message = new Google_Service_Gmail_Message();
-    $text = 'From: John Doe <test.oodoo@gmail.com>
-To: Mary Smith <prakashsankark@gmail.com>
-Subject: Saying Hello
+    $text = 'From: '.$from_name.' <'.$from.'>
+To: '.$to_name.' <'.$to.'>
+Subject: Re: '.$subject.'
 
-This is a message just to say hello.
-So, "Hello"';
+'.$body.'';
+#var_dump($text); die;
 
 
-	$encoded_message = rtrim(strtr(base64_encode($text), '+/', '-_'), '=');
-	$message->setRaw($encoded_message);
+  $encoded_message = rtrim(strtr(base64_encode($text), '+/', '-_'), '=');
+  $message->setRaw($encoded_message);
+  #var_dump($message); die;
     $message = $service->users_messages->send($userId, $message);
     print 'Message with ID: ' . $message->getId() . ' sent.';
     return $message;
@@ -162,6 +169,7 @@ So, "Hello"';
   }
 }
 
+
 public function showMessage($messageId) {
   $client = $this->getClient();
   $service = new Google_Service_Gmail($client);
@@ -169,20 +177,40 @@ public function showMessage($messageId) {
   $optParamsGet2['format'] = 'full';
 
     $data['message'] = $message = $service->users_messages->get('me',$messageId, $optParamsGet2);
+    $hi = $message->getPayload()->getHeaders();
+    #var_dump($hi); die;
+            if ($hi->getName() == 'Subject') {
+
+                $message_subject = $single->getValue();
+
+            }
+    var_dump($message_subject); die;
     $array_flatten = array_flatten($message);
-    #var_dump($array_flatten); die;
-    $data['subject'] = $array_flatten[array_search("Subject", $array_flatten)+1];
+    var_dump($array_flatten); die;
+    $data['subject'] = $subject = $array_flatten[array_search("Subject", $array_flatten)+1];
     $messageSender = $array_flatten[array_search("Received-SPF", $array_flatten)+1];
-    $data['messageSender'] = email_address($messageSender);
-    $data['messageTo'] = $array_flatten[array_search("Delivered-To", $array_flatten)+1];
+    $data['messageSender'] = $messageSender = email_address($messageSender);
+    $data['messageTo'] = $messageTo = $array_flatten[array_search("Delivered-To", $array_flatten)+1];
     $data['from'] = $array_flatten[array_search("From", $array_flatten)+1];
     $data['to'] = $array_flatten[array_search("To", $array_flatten)+1 ];
     $time = $array_flatten[array_search("Date", $array_flatten)+1 ];
-    $data['time'] = date("d M Y H:i:s", strtotime($time));
+    $data['time'] = $time = date("d M Y H:i:s", strtotime($time));
+    $body = end($array_flatten);
+    $data['body'] = $body = base64_decode(str_pad(strtr($body, '-_', '+/'), strlen($body) % 4, '=', STR_PAD_RIGHT)); 
+    #var_dump($body); die;
+    $idCheck = InboxMail::where('messageid', $message->id)->get();
+    if(count($idCheck) == 0){
+    $inboxmail=new InboxMail();
+    $inboxmail->messageid = $message->id;
+    $inboxmail->subject = $subject;
+    $inboxmail->from_mail = $messageSender;
+    $inboxmail->to_mail = $messageTo;
+    $inboxmail->time = $time;
+    $inboxmail->body = $body;
+    $inboxmail->save();
+}
 
     #$body = $message['payload']['parts']['0']['body']['data'];
-    $body = end($array_flatten);
-    $data['body'] = base64_decode(str_pad(strtr($body, '-_', '+/'), strlen($body) % 4, '=', STR_PAD_RIGHT)); 
   return View::make('api.show', $data);
 }
 public function array_flatten($array) { 
