@@ -169,40 +169,20 @@ public function showMessage($messageId) {
   $optParamsGet2['format'] = 'full';
 
     $data['message'] = $message = $service->users_messages->get('me',$messageId, $optParamsGet2);
-    $array_flatten = array_flatten($message); 
+    $array_flatten = array_flatten($message);
     #var_dump($array_flatten); die;
-    $subject = $array_flatten[array_search("Subject", $array_flatten)+1];
+    $data['subject'] = $array_flatten[array_search("Subject", $array_flatten)+1];
     $messageSender = $array_flatten[array_search("Received-SPF", $array_flatten)+1];
-    $messageSender = email_address($messageSender);
-    $messageTo = $array_flatten[array_search("Delivered-To", $array_flatten)+1];
-    $from = $array_flatten[array_search("From", $array_flatten)+1];
-    $to = $array_flatten[array_search("To", $array_flatten)+1 ];
-    var_dump($messageSender); die;
+    $data['messageSender'] = email_address($messageSender);
+    $data['messageTo'] = $array_flatten[array_search("Delivered-To", $array_flatten)+1];
+    $data['from'] = $array_flatten[array_search("From", $array_flatten)+1];
+    $data['to'] = $array_flatten[array_search("To", $array_flatten)+1 ];
+    $time = $array_flatten[array_search("Date", $array_flatten)+1 ];
+    $data['time'] = date("d M Y H:i:s", strtotime($time));
 
-    $data['subject'] = $array_flatten[$subject+1];
-    foreach($return as $ret){
-      var_dump($ret->From); die;
-    }
-
-    $data = base64_decode(str_pad(strtr($message->raw, '-_', '+/'), strlen($message->raw) % 4, '=', STR_PAD_RIGHT));
-    # var_dump($message['payload']['headers']['12']['value']); die;
-   
-
-
-
-
-
-
-
-
-
-
-
-    $body = $message['payload']['parts']['0']['body']['data'];
-    $sender = $message['payload']['headers']['5']['value'];
-    $data['body'] = base64_decode(str_pad(strtr($body, '-_', '+/'), strlen($body) % 4, '=', STR_PAD_RIGHT));
-
-  
+    #$body = $message['payload']['parts']['0']['body']['data'];
+    $body = end($array_flatten);
+    $data['body'] = base64_decode(str_pad(strtr($body, '-_', '+/'), strlen($body) % 4, '=', STR_PAD_RIGHT)); 
   return View::make('api.show', $data);
 }
 public function array_flatten($array) { 
