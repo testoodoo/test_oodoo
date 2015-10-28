@@ -14,7 +14,7 @@ class InboxTable extends Migration {
 	{
 	Schema::create('inbox_table', function(Blueprint $table)
         {
-  			$table->integer('id');
+  			$table->increments('id');
   			$table->string('messageid')->unique(); 
   			$table->string('subject');
   			$table->string('from_mail'); 

@@ -95,8 +95,9 @@ $list = $service->users_messages->listUsersMessages('me',['maxResults' => 20]);
     foreach($messageList as $mlist){
 
         $optParamsGet2['format'] = 'full';
+        #$optParamsGet2['labelIds'] = 'INBOX';
         $single_message = $service->users_messages->get('me',$mlist->id, $optParamsGet2);
-        #if(($single_message->getLabelIds()['0'] == 'INBOX')){
+        #if(($single_message->getLabelIds()['0'] == 'INBOX')){    //to receive only inbox
         $message_id = $mlist->id;
         $headers = $single_message->getPayload()->getHeaders();
         $snippet = $single_message->getSnippet();
@@ -173,22 +174,18 @@ Subject: Re: '.$subject.'
 
 
 public function showMessage($messageId){
-  #$body = "PGh0bWw-DQo8aGVhZD4NCjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIgY29udGVudD0idGV4dC9odG1sOyBjaGFyc2V0PWlzby04ODU5LTEiPg0KPHN0eWxlIHR5cGU9InRleHQvY3NzIiBzdHlsZT0iZGlzcGxheTpub25lOyI-PCEtLSBQIHttYXJnaW4tdG9wOjA7bWFyZ2luLWJvdHRvbTowO30gLS0-PC9zdHlsZT4NCjwvaGVhZD4NCjxib2R5IGRpcj0ibHRyIj4NCjxkaXYgaWQ9ImRpdnRhZ2RlZmF1bHR3cmFwcGVyIiBzdHlsZT0iZm9udC1zaXplOjEycHQ7Y29sb3I6IzAwMDAwMDtiYWNrZ3JvdW5kLWNvbG9yOiNGRkZGRkY7Zm9udC1mYW1pbHk6Q2FsaWJyaSxBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZjsiPg0KPHA-VW5yZWFkIGJvZHk8L3A-DQo8L2Rpdj4NCjwvYm9keT4NCjwvaHRtbD4NCg==";
-  #$body = "VW5yZWFkIGJvZHkNCg==";
-  #$hi = base64_decode(str_pad(strtr($body, '-_', '+/'), strlen($body) % 4, '=', STR_PAD_RIGHT));
-  #var_dump($hi); die;
   $client = $this->getClient();
   $service = new Google_Service_Gmail($client);
   $userId = 'me';
   $optParamsGet2['format'] = 'full';
 
   $message = $service->users_messages->get('me',$messageId, $optParamsGet2);
+
   $headers = $message->getPayload()->getHeaders();
   foreach ($headers as $header) {
-    var_dump($message); die;
-    var_dump($message->getPayload()->getBody()); die;
+    #var_dump($message); die;
         if ($header->getName() == 'Subject') {
-          $data['subject'] = $header->getValue();         
+          $data['subject'] = $subject = $header->getValue();         
         }
         if($header->getName() == 'From'){
           $data['from'] = $header->getValue();
@@ -197,86 +194,38 @@ public function showMessage($messageId){
           $data['to'] = $header->getValue();
         } 
         if($header->getName() == 'Received-SPF'){
-          $data['from_mail'] = email_address($header->getValue());
+          $data['messageSender'] = $messageSender = email_address($header->getValue());
         }
         if($header->getName() == 'Delivered-To'){
-          $data['to_mail'] = $to_mail = email_address($header->getValue());
+          $data['messageTo'] = $messageTo = $to_mail = email_address($header->getValue());
         }
         if ($header->getName() == 'Date') {
           $message_date = $header->getValue();
-          $data['message_date'] = date('Y-m-d H:i:s', strtotime($message_date));
+          $data['time'] = $time = date('Y-m-d H:i:s', strtotime($message_date));
         }
 
   }
+  $body = $message->getPayload()->getParts()['0']->body['data'];
+  $htmlBody = $message->getPayload()->getParts()['1']->body['data'];
+  $data['body'] = $body = base64_decode(str_pad(strtr($body, '-_', '+/'), strlen($body) % 4, '=', STR_PAD_RIGHT));
 
-
-
-
-
-
-
-}
-
-
-public function showMessagew($messageId) {
-  $client = $this->getClient();
-  $service = new Google_Service_Gmail($client);
-  $userId = 'me';
-  $optParamsGet2['format'] = 'full';
-
-    $data['message'] = $message = $service->users_messages->get('me',$messageId, $optParamsGet2);
-    $headers = $message->getPayload ()->getHeaders();
-    foreach($headers as $header)
-            if ($header->getName() == 'Subject') {
-
-                $message_subject = $header->getValue();
-
-            }
-    $array_flatten = array_flatten($message);
-    $data['subject'] = $subject = $array_flatten[array_search("Subject", $array_flatten)+1];
-    $messageSender = $array_flatten[array_search("Received-SPF", $array_flatten)+1];
-    $data['messageSender'] = $messageSender = email_address($messageSender);
-    $data['messageTo'] = $messageTo = $array_flatten[array_search("Delivered-To", $array_flatten)+1];
-    $data['from'] = $array_flatten[array_search("From", $array_flatten)+1];
-    $data['to'] = $array_flatten[array_search("To", $array_flatten)+1 ];
-    $time = $array_flatten[array_search("Date", $array_flatten)+1 ];
-    $data['time'] = $time = date("d M Y H:i:s", strtotime($time));
-    $body = end($array_flatten);
-    $data['body'] = $body = base64_decode(str_pad(strtr($body, '-_', '+/'), strlen($body) % 4, '=', STR_PAD_RIGHT)); 
-    #var_dump($body); die;
-    $idCheck = InboxMail::where('messageid', $message->id)->get();
+  $idCheck = InboxMail::where('messageid', $message->id)->get();
     if(count($idCheck) == 0){
-    $inboxmail=new InboxMail();
-    $inboxmail->messageid = $message->id;
-    $inboxmail->subject = $subject;
-    $inboxmail->from_mail = $messageSender;
-    $inboxmail->to_mail = $messageTo;
-    $inboxmail->time = $time;
-    $inboxmail->body = $body;
-    $inboxmail->save();
-}
+      $inboxmail=new InboxMail();
+      $inboxmail->messageid = $message->id;
+      $inboxmail->subject = $subject;
+      $inboxmail->from_mail = $messageSender;
+      $inboxmail->to_mail = $messageTo;
+      $inboxmail->time = $time;
+      $inboxmail->body = $body;
+      $inboxmail->save();
+  }
 
-    #$body = $message['payload']['parts']['0']['body']['data'];
   return View::make('api.show', $data);
 }
-public function array_flatten($array) { 
-  if (!is_array($array)) { 
-    return FALSE; 
-  } 
-  $result = array(); 
-  foreach ($array as $key => $value) { 
-    if (is_array($value)) { 
-      $arrayList=array_flatten($value);
-      foreach ($arrayList as $listItem) {
-        $result[] = $listItem; 
-      }
-    } 
-   else { 
-    $result[$key] = $value; 
-   } 
-  } 
-  return $result; 
-}
+
+
+
 
 public function getClient() {
   $client = new Google_Client();
