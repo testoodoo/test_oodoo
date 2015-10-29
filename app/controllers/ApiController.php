@@ -97,7 +97,7 @@ $list = $service->users_messages->listUsersMessages('me',['maxResults' => 20]);
         $optParamsGet2['format'] = 'full';
         #$optParamsGet2['labelIds'] = 'INBOX';
         $single_message = $service->users_messages->get('me',$mlist->id, $optParamsGet2);
-        #if(($single_message->getLabelIds()['0'] == 'INBOX')){    //to receive only inbox
+        if(($single_message->getLabelIds()['0'] == 'INBOX')){    //to receive only inbox
         $message_id = $mlist->id;
         $headers = $single_message->getPayload()->getHeaders();
         $snippet = $single_message->getSnippet();
@@ -136,7 +136,7 @@ $list = $service->users_messages->listUsersMessages('me',['maxResults' => 20]);
        # $inboxMessage = json_decode($inboxMessage);
         #var_dump($inboxMessage); die;
 
-    #}
+    }
   }
     #return $inboxMessage;
     return View::make("api.list",$inboxMessage);
@@ -165,6 +165,15 @@ Subject: Re: '.$subject.'
   $message->setRaw($encoded_message);
   #var_dump($message); die;
     $message = $service->users_messages->send($userId, $message);
+      $inboxmail=new InboxMail();
+      $inboxmail->messageid = $message->getId();
+      $inboxmail->subject = $subject;
+      $inboxmail->from_mail = $from;
+      $inboxmail->to_mail = $to;
+      $time = date('Y-m-d H:i:s');
+      $inboxmail->time = $time;
+      $inboxmail->body = $body;
+      $inboxmail->save();
     print 'Message with ID: ' . $message->getId() . ' sent.';
     return $message;
   } catch (Exception $e) {
@@ -180,6 +189,13 @@ public function showMessage($messageId){
   $optParamsGet2['format'] = 'full';
 
   $message = $service->users_messages->get('me',$messageId, $optParamsGet2);
+  #var_dump($message); die;
+  #$body = $message->getPayload()->getParts();
+  #var_dump($body); die;
+  
+
+
+
 
   $headers = $message->getPayload()->getHeaders();
   foreach ($headers as $header) {
@@ -205,6 +221,8 @@ public function showMessage($messageId){
         }
 
   }
+
+  // inbox message working fine
   $body = $message->getPayload()->getParts()['0']->body['data'];
   $htmlBody = $message->getPayload()->getParts()['1']->body['data'];
   $data['body'] = $body = base64_decode(str_pad(strtr($body, '-_', '+/'), strlen($body) % 4, '=', STR_PAD_RIGHT));
