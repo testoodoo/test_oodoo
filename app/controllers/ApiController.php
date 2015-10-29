@@ -155,7 +155,7 @@ public function replyMessage() {
     $message = new Google_Service_Gmail_Message();
     $text = 'From: '.$from_name.' <'.$from.'>
 To: '.$to_name.' <'.$to.'>
-Subject: Re: '.$subject.'
+Subject:'.$subject.'
 
 '.$body.'';
 #var_dump($text); die;
@@ -189,12 +189,37 @@ public function showMessage($messageId){
   $optParamsGet2['format'] = 'full';
 
   $message = $service->users_messages->get('me',$messageId, $optParamsGet2);
-  #var_dump($message); die;
-  #$body = $message->getPayload()->getParts();
-  #var_dump($body); die;
-  
+  $flatten_array = array_flatten($message);
+  $body = end($flatten_array);
+  #$message = array_flatten($message);
 
 
+  $body = $message->getPayload()->getBody();
+  $body_new = decode_body($body['data']);
+  if(!$body_new){
+   $parts = $message->getPayload()->getParts();
+   foreach($parts as $part){
+    if($part['body']) {
+                        $body_new = decode_body($part['body']->data);
+                        if($body_new === true){
+                          break;
+                        }
+                    }
+
+                    if($part['parts'] && !$body_new) {
+                        foreach ($part['parts'] as $p) {
+                            // replace 'text/html' by 'text/plain' if you prefer
+                            if($p['mimeType'] === 'text/plain' && $p['body']) {
+                                $body_new = decode_body($p['body']->data);
+                                break;
+                            }
+                        }
+                    }
+                    if($body_new) {
+                        break;
+                    }
+                }
+            }
 
 
   $headers = $message->getPayload()->getHeaders();
@@ -204,16 +229,16 @@ public function showMessage($messageId){
           $data['subject'] = $subject = $header->getValue();         
         }
         if($header->getName() == 'From'){
-          $data['from'] = $header->getValue();
+          $data['from'] = $from = $header->getValue();
         }
         if($header->getName() == 'To'){
-          $data['to'] = $header->getValue();
+          $data['to'] = $to = $header->getValue();
         } 
         if($header->getName() == 'Received-SPF'){
-          $data['messageSender'] = $messageSender = email_address($header->getValue());
+          $data['messageSender'] = $messgeSender = $messageSender = email_address($header->getValue());
         }
         if($header->getName() == 'Delivered-To'){
-          $data['messageTo'] = $messageTo = $to_mail = email_address($header->getValue());
+          $data['messageTo'] = $messageTo = $messageTo = $to_mail = email_address($header->getValue());
         }
         if ($header->getName() == 'Date') {
           $message_date = $header->getValue();
@@ -223,9 +248,14 @@ public function showMessage($messageId){
   }
 
   // inbox message working fine
-  $body = $message->getPayload()->getParts()['0']->body['data'];
-  $htmlBody = $message->getPayload()->getParts()['1']->body['data'];
-  $data['body'] = $body = base64_decode(str_pad(strtr($body, '-_', '+/'), strlen($body) % 4, '=', STR_PAD_RIGHT));
+  /*if (preg_match('#^Re: #', $subject) === 1) {
+    $body = $message->getPayload()->body['data'];
+  }else{
+    $body = $message->getPayload()->getParts()['0']->body['data'];
+    $body = $message->getPayload()->getParts()['1']->body['data'];
+  #}*/
+  $data['body'] = $body = $body_new;
+  //$data['body'] = $body = base64_decode(str_pad(strtr($body, '-_', '+/'), strlen($body) % 4, '=', STR_PAD_RIGHT));
 
   $idCheck = InboxMail::where('messageid', $message->id)->get();
     if(count($idCheck) == 0){
@@ -298,5 +328,16 @@ function email_address($string) {
                     return $email;
                 }
             }
+
+}
+
+function decode_body($body) {
+    $rawData = $body;
+    $sanitizedData = strtr($rawData,'-_', '+/');
+    $decodedMessage = base64_decode($sanitizedData);
+    if(!$decodedMessage){
+        $decodedMessage = FALSE;
+    }
+    return $decodedMessage;
 
 }
