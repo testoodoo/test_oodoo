@@ -189,11 +189,8 @@ public function showMessage($messageId){
   $optParamsGet2['format'] = 'full';
 
   $message = $service->users_messages->get('me',$messageId, $optParamsGet2);
-  $flatten_array = array_flatten($message);
-  $body = end($flatten_array);
-  #$message = array_flatten($message);
 
-
+  //  body message
   $body = $message->getPayload()->getBody();
   $body_new = decode_body($body['data']);
   if(!$body_new){
@@ -220,11 +217,15 @@ public function showMessage($messageId){
                     }
                 }
             }
+  $data['body'] = $body = $body_new;
 
 
+  // attachment
+
+
+  // headers like from, to, date, names, subject         
   $headers = $message->getPayload()->getHeaders();
   foreach ($headers as $header) {
-    #var_dump($message); die;
         if ($header->getName() == 'Subject') {
           $data['subject'] = $subject = $header->getValue();         
         }
@@ -254,7 +255,6 @@ public function showMessage($messageId){
     $body = $message->getPayload()->getParts()['0']->body['data'];
     $body = $message->getPayload()->getParts()['1']->body['data'];
   #}*/
-  $data['body'] = $body = $body_new;
   //$data['body'] = $body = base64_decode(str_pad(strtr($body, '-_', '+/'), strlen($body) % 4, '=', STR_PAD_RIGHT));
 
   $idCheck = InboxMail::where('messageid', $message->id)->get();
