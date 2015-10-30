@@ -181,14 +181,51 @@ Subject:'.$subject.'
   }
 }
 
-
 public function showMessage($messageId){
   $client = $this->getClient();
   $service = new Google_Service_Gmail($client);
   $userId = 'me';
   $optParamsGet2['format'] = 'full';
 
-  $message = $service->users_messages->get('me',$messageId, $optParamsGet2);
+  $message = $service->users_messages->get($userId,$messageId, $optParamsGet2);
+  #print 'Message with ID: ' . $message->getId() . ' retrieved.';
+  #print_r($message); die;
+
+  $parts = $message->getPayload()->getParts();
+  #var_dump($parts); die;
+  foreach ($parts as $part ) {
+
+    #echo 'hi';
+    //attachment success
+    if ($part->getFilename() != null && strlen($part->getFilename())   > 0) {
+    
+        $filename = $part->getFilename();
+        $attId = $part->getBody()->getAttachmentId();
+        $attachPart = $service->users_messages_attachments->get($userId, $messageId, $attId);
+        $attachPart = strtr($attachPart->getData() , "-_" , "+/" );
+        $code_base64 = $attachPart;
+        $code_binary = base64_decode($code_base64);
+        $file_ext = new SplFileInfo($filename);
+        $file_ext = $file_ext->getExtension();
+        $file_hash = hash('sha256', $attId);
+        $file_location = '/tmp/'.$file_hash.'.'.$file_ext;
+        file_put_contents($file_location, $code_binary);
+        #echo "Your attachment ". $filename." with id ".$attId." saved succesfully at ".$file_location;
+        // $image= imagecreatefromstring($code_binary);
+        // header('Content-Type: image/jpeg');
+        // imagejpeg($image);
+        // imagedestroy($image);
+
+     }
+   } 
+
+  // #echo '<img src="data:image/png;base64, '.$hello.'" alt="summa" />'; die;
+  
+  // $hello = "ANGjdJ-kDPFTGQyAhWUQKYNoVBkoY3e_DzcBfLKo_nU8AwqhrkFGXqqcVPPXs0lrd1tgn8jr-JOSEGbtAxZP2l1wAbScMkq8ZU9ylGanY3dF038gOuHBtU86hD0vp8bpiLE_CA4TNep-IPQHfBWDIOdUK5gNNJYcJD3qa34OEri90c5rFBtTSDUiN8QKa-cZtiBcZ27k-aVdcE8Na3J-4cC43gAbtGA5jtvsYa1Yh1rUEA3q3uhRqXbIXIo5sQ9J6cpDKP-SpI4LzyI6OkxPXij0Lzo81nN6_7L7AbWuSXBGI947Nh5ykmYdU4iga_c".'==';
+  // $decoded = strtr($hello, "-_", "+/");
+  // echo $hello;die;
+  // header("Content-type: image/jpeg");
+
 
   //  body message
   $body = $message->getPayload()->getBody();
@@ -205,9 +242,10 @@ public function showMessage($messageId){
 
                     if($part['parts'] && !$body_new) {
                         foreach ($part['parts'] as $p) {
-                            // replace 'text/html' by 'text/plain' if you prefer
                             if($p['mimeType'] === 'text/plain' && $p['body']) {
+                              #var_dump($p['body']->data); die;
                                 $body_new = decode_body($p['body']->data);
+                                #print_r($body_new); die;
                                 break;
                             }
                         }
@@ -218,9 +256,15 @@ public function showMessage($messageId){
                 }
             }
   $data['body'] = $body = $body_new;
+  #var_dump($body_new); die;
 
 
   // attachment
+  $attachment = $message->getPayload()->getParts();
+
+  #var_dump($attachment); die;
+  $hi = array_flatten($attachment);
+
 
 
   // headers like from, to, date, names, subject         
