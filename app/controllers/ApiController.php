@@ -92,14 +92,41 @@ public function listMessage() {
 
             foreach($messageList as $mlist){
                 $optParamsGet2['format'] = 'full';
-                $single_message = $service->users_messages_attachments->get('me',$mlist->id, $optParamsGet2);
-                $raw = $single_message->getBody();
+                $single_message = $service->users_messages->get('me',$mlist->id, $optParamsGet2);
+                #$raw = $single_message->getRaw();  // while using $optParamsGet2 "format" is "raw" instead of "full"
                 #$raw = decode_body($raw);
-                var_dump($raw); die;
+                #var_dump($raw); die;  
+                  //  body message
                 $messageId = $single_message->getId();
                 $threadId = $single_message->getThreadId();
                 $historyId = $single_message->getHistoryId();
                 $labelIds = $single_message->getLabelIds();
+                $body = $single_message->getPayload()->getBody();
+                $body_new = decode_body($body['data']);
+                if(!$body_new){
+                    $parts = $single_message->getPayload()->getParts();
+                    foreach($parts as $part){
+                        if($part['body']) {
+                            $body_new = decode_body($part['body']->data);
+                            if($body_new === true){
+                                break;
+                            }
+                        }
+                        if($part['parts'] && !$body_new) {
+                            foreach ($part['parts'] as $p) {
+                                if($p['mimeType'] === 'text/plain' && $p['body']) {
+                                    $body_new = decode_body($p['body']->data);
+                                    break;
+                                }
+                            }
+                        }
+                        if($body_new) {
+                            break;
+                        }
+                    }
+                }
+                $body = $body_new;
+                var_dump($body_new); die; 
             }   
 
 
