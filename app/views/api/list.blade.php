@@ -816,13 +816,3 @@
 					</div>
 
 @stop
-
-<script type="text/javascript">
-				$('.btn-back-message-list').on('click', function(e) {
-					
-					e.preventDefault();
-					$('#inbox-tabs a[href="#get"]').tab('show');
-				});
-</script>
-
-

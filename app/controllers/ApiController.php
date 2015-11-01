@@ -83,11 +83,34 @@ public function listMessage() {
   #return $messages;
 }
 
-public function getMessage() {
+    public function getMessage() {
+            $client = $this->getClient();
+            $service = new Google_Service_Gmail($client);
+            $userId='me';
+            $list = $service->users_messages->listUsersMessages($userId,['maxResults' => 20]);
+            $messageList = $list->getMessages();
+
+            foreach($messageList as $mlist){
+                $optParamsGet2['format'] = 'full';
+                $single_message = $service->users_messages_attachments->get('me',$mlist->id, $optParamsGet2);
+                $raw = $single_message->getBody();
+                #$raw = decode_body($raw);
+                var_dump($raw); die;
+                $messageId = $single_message->getId();
+                $threadId = $single_message->getThreadId();
+                $historyId = $single_message->getHistoryId();
+                $labelIds = $single_message->getLabelIds();
+            }   
+
+
+
+    }
+
+public function getMessageo() {
 	$client = $this->getClient();
 	$service = new Google_Service_Gmail($client);
 	$userId='me';
-$list = $service->users_messages->listUsersMessages('me',['maxResults' => 20]);
+$list = $service->users_messages->listUsersMessages($userId,['maxResults' => 20]);
 
     $messageList = $list->getMessages();
     $inboxMessage = [];
@@ -204,6 +227,7 @@ public function showMessage($messageId){
         $attachPart = $service->users_messages_attachments->get($userId, $messageId, $attId);
         $attachPart = strtr($attachPart->getData() , "-_" , "+/" );
         $code_base64 = $attachPart;
+        var_dump($code_base64); die;
         $code_binary = base64_decode($code_base64);
         $file_ext = new SplFileInfo($filename);
         $file_ext = $file_ext->getExtension();
