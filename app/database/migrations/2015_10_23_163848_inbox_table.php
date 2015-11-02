@@ -24,8 +24,10 @@ class InboxTable extends Migration {
   			$table->string('to_name');
   			$table->string('from_mail')
   			$table->string('to_mail');
- 			$table->string('time');
  			$table->longtext('body');
+ 			$table->string('file_name');
+ 			$table->text('attachment');
+ 			$table->string('time');
             $table->timestamps();
         });
 	}

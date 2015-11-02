@@ -169,29 +169,20 @@ public function listMessage() {
                         $file_location = '/tmp/'.$file_hash.'.'.$file_ext;
                         #var_dump($file_ext); die;
                         file_put_contents($file_location, $code_binary);
-                        echo "Your attachment ". $filename." with id ".$attId." saved succesfully at ".$file_location;
-        $attachment = [];
-         $attachment = [
-            'filename' => $filename,
-            'attachmnetId' => $attId,
-            'filelocation' => $file_location
-        ];
+                        #echo "Your attachment ". $filename." with id ".$attId." saved succesfully at ".$file_location;
+                        $attachment[] = [
+                        'filename' => $filename,
+                        'attachmentId' => $attId,
+                        'filelocation' => $file_location
+                        ];
                         // $image= imagecreatefromstring($code_binary);
                         // header('Content-Type: image/jpeg');
                         // imagejpeg($image);
                         // imagedestroy($image);
                     }
                 }
-
-                // #echo '<img src="data:image/png;base64, '.$hello.'" alt="summa" />'; die;
-
-                // $hello = "ANGjdJ-kDPFTGQyAhWUQKYNoVBkoY3e_DzcBfLKo_nU8AwqhrkFGXqqcVPPXs0lrd1tgn8jr-JOSEGbtAxZP2l1wAbScMkq8ZU9ylGanY3dF038gOuHBtU86hD0vp8bpiLE_CA4TNep-IPQHfBWDIOdUK5gNNJYcJD3qa34OEri90c5rFBtTSDUiN8QKa-cZtiBcZ27k-aVdcE8Na3J-4cC43gAbtGA5jtvsYa1Yh1rUEA3q3uhRqXbIXIo5sQ9J6cpDKP-SpI4LzyI6OkxPXij0Lzo81nN6_7L7AbWuSXBGI947Nh5ykmYdU4iga_c".'==';
-                // $decoded = strtr($hello, "-_", "+/");
-                // echo $hello;die;
-                // header("Content-type: image/jpeg");
-
-
-
+                $attachment = json_encode($attachment);
+                var_dump($attachment); die;
 
              /*   $idCheck = InboxMail::where('messageid', $message->id)->get();
                 if(count($idCheck) == 0){
