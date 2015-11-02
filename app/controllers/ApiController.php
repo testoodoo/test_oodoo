@@ -93,14 +93,40 @@ public function listMessage() {
             foreach($messageList as $mlist){
                 $optParamsGet2['format'] = 'full';
                 $single_message = $service->users_messages->get('me',$mlist->id, $optParamsGet2);
+                #var_dump($single_message->getPayload()->getFilename());die;
                 #$raw = $single_message->getRaw();  // while using $optParamsGet2 "format" is "raw" instead of "full"
-                #$raw = decode_body($raw);
-                #var_dump($raw); die;  
-                  //  body message
                 $messageId = $single_message->getId();
                 $threadId = $single_message->getThreadId();
                 $historyId = $single_message->getHistoryId();
                 $labelIds = $single_message->getLabelIds();
+                #var_dump(json_decode(json_encode($labelIds))); die;
+
+                $headers = $single_message->getPayload()->getHeaders();
+                    foreach ($headers as $header) {
+                        if ($header->getName() == 'Subject') {
+                            $subject = $header->getValue();         
+                        }
+                        if($header->getName() == 'From'){
+                            $from = $header->getValue();
+                        }
+                        if($header->getName() == 'To'){
+                            $to = $header->getValue();
+                        } 
+                        if($labelIds[0] == 'INBOX'){
+                            if($header->getName() == 'Received-SPF'){
+                                $messgeSender = $messageSender = email_address($header->getValue());
+                            }
+                            if($header->getName() == 'Delivered-To'){
+                                $messageTo = $messageTo = $to_mail = email_address($header->getValue());
+                            }
+                        }
+                        if ($header->getName() == 'Date') {
+                            $message_date = $header->getValue();
+                            $time = date('Y-m-d H:i:s', strtotime($message_date));
+                        }
+
+                }
+                /*  body message   */
                 $body = $single_message->getPayload()->getBody();
                 $body_new = decode_body($body['data']);
                 if(!$body_new){
@@ -126,17 +152,69 @@ public function listMessage() {
                     }
                 }
                 $body = $body_new;
-                var_dump($body_new); die; 
+
+                //attachment success
+                $parts = $single_message->getPayload()->getParts();
+                foreach ($parts as $part ) {
+                    if ($part->getFilename() != null && strlen($part->getFilename())   > 0) {
+                        $filename = $part->getFilename();
+                        $attId = $part->getBody()->getAttachmentId();
+                        $attachPart = $service->users_messages_attachments->get($userId, $messageId, $attId);
+                        $attachPart = strtr($attachPart->getData() , "-_" , "+/" );
+                        $code_base64 = $attachPart;
+                        $code_binary = base64_decode($code_base64);
+                        $file_ext = new SplFileInfo($filename);
+                        $file_ext = $file_ext->getExtension();
+                        $file_hash = hash('sha256', $attId);
+                        $file_location = '/tmp/'.$file_hash.'.'.$file_ext;
+                        #var_dump($file_ext); die;
+                        file_put_contents($file_location, $code_binary);
+                        echo "Your attachment ". $filename." with id ".$attId." saved succesfully at ".$file_location;
+        $attachment = [];
+         $attachment = [
+            'filename' => $filename,
+            'attachmnetId' => $attId,
+            'filelocation' => $file_location
+        ];
+                        // $image= imagecreatefromstring($code_binary);
+                        // header('Content-Type: image/jpeg');
+                        // imagejpeg($image);
+                        // imagedestroy($image);
+                    }
+                }
+
+                // #echo '<img src="data:image/png;base64, '.$hello.'" alt="summa" />'; die;
+
+                // $hello = "ANGjdJ-kDPFTGQyAhWUQKYNoVBkoY3e_DzcBfLKo_nU8AwqhrkFGXqqcVPPXs0lrd1tgn8jr-JOSEGbtAxZP2l1wAbScMkq8ZU9ylGanY3dF038gOuHBtU86hD0vp8bpiLE_CA4TNep-IPQHfBWDIOdUK5gNNJYcJD3qa34OEri90c5rFBtTSDUiN8QKa-cZtiBcZ27k-aVdcE8Na3J-4cC43gAbtGA5jtvsYa1Yh1rUEA3q3uhRqXbIXIo5sQ9J6cpDKP-SpI4LzyI6OkxPXij0Lzo81nN6_7L7AbWuSXBGI947Nh5ykmYdU4iga_c".'==';
+                // $decoded = strtr($hello, "-_", "+/");
+                // echo $hello;die;
+                // header("Content-type: image/jpeg");
+
+
+
+
+             /*   $idCheck = InboxMail::where('messageid', $message->id)->get();
+                if(count($idCheck) == 0){
+                    $inboxmail=new InboxMail();
+                    $inboxmail->messageId = $mlist->id;
+                    $inboxmail->subject = $subject;
+                    $inboxmail->from_mail = $messageSender;
+                    $inboxmail->to_mail = $messageTo;
+                    $inboxmail->time = $time;
+                    $inboxmail->body = $body;
+                    $inboxmail->save();
+                }*/
             }   
 
 
 
+var_dump($attachment); die;
     }
 
 public function getMessageo() {
-	$client = $this->getClient();
-	$service = new Google_Service_Gmail($client);
-	$userId='me';
+    $client = $this->getClient();
+    $service = new Google_Service_Gmail($client);
+    $userId='me';
 $list = $service->users_messages->listUsersMessages($userId,['maxResults' => 20]);
 
     $messageList = $list->getMessages();
