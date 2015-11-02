@@ -20,8 +20,6 @@ class InboxTable extends Migration {
   			$table->string('history_id'); 
   			$table->string('label');
   			$table->string('subject');
-  			$table->string('from_name');
-  			$table->string('to_name');
   			$table->string('from_mail');
   			$table->string('to_mail');
  			$table->longtext('body');

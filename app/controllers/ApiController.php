@@ -116,14 +116,6 @@ public function listMessage() {
                             $to = $header->getValue();
                             #var_dump($to); die;
                         } 
-                        if($labelIds[0] == 'INBOX'){
-                            if($header->getName() == 'Received-SPF'){
-                                $messageSender = email_address($header->getValue());
-                            }
-                            if($header->getName() == 'Delivered-To'){
-                                $messageTo = $to_mail = email_address($header->getValue());
-                            }
-                        }
                         if ($header->getName() == 'Date') {
                             $message_date = $header->getValue();
                             $time = date('Y-m-d H:i:s', strtotime($message_date));
@@ -195,12 +187,8 @@ public function listMessage() {
                     $inboxmail->history_id = $historyId;
                     $inboxmail->label = $labelIds['0'];
                     $inboxmail->subject = $subject;
-                    $inboxmail->from_name = $from;
-                    $inboxmail->to_name = $to;
-                    if($labelIds['0'] == 'INBOX'){
-                        $inboxmail->from_mail = $messageSender;
-                        $inboxmail->to_mail = $messageTo;
-                    }
+                    $inboxmail->from_mail = $from;
+                    $inboxmail->to_mail = $to;
                     $inboxmail->body = $body;
                     if(isset($attachment)){
                         $inboxmail->attachment = json_encode($attachment);
