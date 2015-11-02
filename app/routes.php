@@ -14,6 +14,6 @@
 	Route::get('/oauth2callback', array('as' => 'index', 'uses' => 'ApiController@index'));
 	Route::get('/send', array('as' => 'send', 'uses' => 'ApiController@createMessage'));
 	Route::get('/list', array('as' => 'list', 'uses' => 'ApiController@listMessage'));
-	Route::get('/mail', array('as' => 'mail', 'uses' => 'ApiController@getMessage'));
+	Route::get('/update', array('as' => 'mail', 'uses' => 'ApiController@updateMessage'));
 	Route::get('/show/{messageId}', array('as' => 'show', 'uses' => 'ApiController@showMessage'));	
 	Route::post('/reply', array('as' => 'reply', 'uses' => 'ApiController@replyMessage'));

@@ -83,14 +83,17 @@ public function listMessage() {
   #return $messages;
 }
 
-    public function getMessage() {
+    public function updateMessage() {
             $client = $this->getClient();
             $service = new Google_Service_Gmail($client);
             $userId='me';
-            $list = $service->users_messages->listUsersMessages($userId,['maxResults' => 20]);
+            $list = $service->users_messages->listUsersMessages($userId,['maxResults' => 1000]);
             $messageList = $list->getMessages();
 
             foreach($messageList as $mlist){
+                $idCheck = InboxMail::where('message_id', $mlist->id)->get();
+                if(count($idCheck) == 0){
+
                 $optParamsGet2['format'] = 'full';
                 $single_message = $service->users_messages->get('me',$mlist->id, $optParamsGet2);
                 #var_dump($single_message->getPayload()->getFilename());die;
@@ -111,13 +114,14 @@ public function listMessage() {
                         }
                         if($header->getName() == 'To'){
                             $to = $header->getValue();
+                            #var_dump($to); die;
                         } 
                         if($labelIds[0] == 'INBOX'){
                             if($header->getName() == 'Received-SPF'){
-                                $messgeSender = $messageSender = email_address($header->getValue());
+                                $messageSender = email_address($header->getValue());
                             }
                             if($header->getName() == 'Delivered-To'){
-                                $messageTo = $messageTo = $to_mail = email_address($header->getValue());
+                                $messageTo = $to_mail = email_address($header->getValue());
                             }
                         }
                         if ($header->getName() == 'Date') {
@@ -154,6 +158,7 @@ public function listMessage() {
                 $body = $body_new;
 
                 //attachment success
+                unset($attachment);
                 $parts = $single_message->getPayload()->getParts();
                 foreach ($parts as $part ) {
                     if ($part->getFilename() != null && strlen($part->getFilename())   > 0) {
@@ -181,25 +186,34 @@ public function listMessage() {
                         // imagedestroy($image);
                     }
                 }
-                $attachment = json_encode($attachment);
-                var_dump($attachment); die;
 
-             /*   $idCheck = InboxMail::where('messageid', $message->id)->get();
-                if(count($idCheck) == 0){
+
+
                     $inboxmail=new InboxMail();
-                    $inboxmail->messageId = $mlist->id;
+                    $inboxmail->message_id = $mlist->id;
+                    $inboxmail->thread_id = $threadId;
+                    $inboxmail->history_id = $historyId;
+                    $inboxmail->label = $labelIds['0'];
                     $inboxmail->subject = $subject;
-                    $inboxmail->from_mail = $messageSender;
-                    $inboxmail->to_mail = $messageTo;
-                    $inboxmail->time = $time;
+                    $inboxmail->from_name = $from;
+                    $inboxmail->to_name = $to;
+                    if($labelIds['0'] == 'INBOX'){
+                        $inboxmail->from_mail = $messageSender;
+                        $inboxmail->to_mail = $messageTo;
+                    }
                     $inboxmail->body = $body;
+                    if(isset($attachment)){
+                        $inboxmail->attachment = json_encode($attachment);
+                    }
+                    $inboxmail->time = $time;
                     $inboxmail->save();
-                }*/
+
             }   
 
+        }
 
 
-var_dump($attachment); die;
+
     }
 
 public function getMessageo() {
