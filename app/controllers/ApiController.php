@@ -204,6 +204,18 @@ public function listMessage() {
 
     }
 
+        public function mailMessage(){
+            return View::make('api.mail');
+        }
+
+        public function inboxMail(){
+            $inboxMail = InboxMail::where('label','INBOX')->get();
+            #var_dump($inboxMail);
+            return $inboxMail;
+        }
+
+
+
 public function getMessageo() {
     $client = $this->getClient();
     $service = new Google_Service_Gmail($client);
@@ -437,6 +449,8 @@ public function showMessage($messageId){
 
   return View::make('api.show', $data);
 }
+
+
 
 
 
